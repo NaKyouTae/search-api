@@ -11,9 +11,9 @@ import lombok.Data;
 public class AccountResult {
 
     /**
-     * 계좌번호
+     * 연도
      */
-    private String accountNo;
+    private int year;
 
     /**
      * 계좌명
@@ -21,8 +21,13 @@ public class AccountResult {
     private String accountName;
 
     /**
-     * 관리점 코드
+     * 계좌번호
      */
-    private String branchCode;
+    private String accountNo;
+
+    /**
+     * 총 금액
+     */
+    private int sumAmt;
 }
 

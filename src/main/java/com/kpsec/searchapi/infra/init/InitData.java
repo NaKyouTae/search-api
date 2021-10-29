@@ -7,6 +7,7 @@ import com.kpsec.searchapi.repository.AccountRepository;
 import com.kpsec.searchapi.repository.ManagementPointRepository;
 import com.kpsec.searchapi.repository.TransactionHistoryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -26,11 +27,17 @@ import java.util.stream.Collectors;
  */
 @Component
 @RequiredArgsConstructor
-public class initData {
+public class InitData {
 
     private final AccountRepository accountRepository; // 계좌 정보 Repository
     private final TransactionHistoryRepository transactionHistoryRepository; // 거래 내역 Repository
     private final ManagementPointRepository managementPointRepository; // 관리점 Repository
+
+    public void init() throws IOException {
+        this.initAccount();
+        this.initHistory();
+        this.initManagementPoint();
+    }
 
     /**
      * 계좌 정보를 읽어와 메모리 DB에 저장하는 메서드
@@ -73,7 +80,7 @@ public class initData {
                                 .transactionNo(split[2])
                                 .amount(Integer.parseInt(split[3]))
                                 .commission(Integer.parseInt(split[4]))
-                                .cancelYn((split[5].equals("Y")) ? true : false)
+                                .cancelYn(split[5].equals("Y"))
                                 .build();
                     }).collect(Collectors.toList());
 

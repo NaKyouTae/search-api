@@ -16,7 +16,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "KP_TB_TRANSACTION_HISTORY")
+@Table(name = "KPSEC_TB_TRANSACTION_HISTORY")
 public class TransactionHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

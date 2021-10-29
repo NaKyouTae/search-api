@@ -13,7 +13,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "KP_TB_MANAGEMENT_POINT")
+@Table(name = "KPSEC_TB_MANAGEMENT_POINT")
 public class ManagementPoint {
 
     /**
