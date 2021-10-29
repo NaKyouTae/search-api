@@ -3,10 +3,7 @@ package com.kpsec.searchapi.model.entity;
 import com.sun.istack.NotNull;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 /**
  * Create by na kyutae 2021-10-29.
@@ -16,6 +13,7 @@ import javax.persistence.Id;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Table(name = "KP_TB_MANAGEMENT_POINT")
 public class ManagementPoint {
 
     /**
