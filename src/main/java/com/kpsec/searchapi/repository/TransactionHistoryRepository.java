@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 /**
  * Create by na kyutae 2021-10-29.
  */
-public interface TransactionHistoryRepository extends JpaRepository<TransactionHistory, String> {
+public interface TransactionHistoryRepository extends JpaRepository<TransactionHistory, Long> {
 }

@@ -40,7 +40,7 @@ public class initData {
     @PostConstruct
     private void initAccount() throws IOException {
         if (accountRepository.count() == 0) {
-            Resource resource = new ClassPathResource("static/계좌정보.csv");
+            Resource resource = new ClassPathResource("static/data/계좌정보.csv");
             List<Account> accounts = Files.readAllLines(resource.getFile().toPath(), StandardCharsets.UTF_8)
                     .stream().skip(1).map(line -> {
                         String[] split = line.split(",");
@@ -63,7 +63,7 @@ public class initData {
     @PostConstruct
     private void initHistory() throws IOException {
         if (transactionHistoryRepository.count() == 0) {
-            Resource resource = new ClassPathResource("static/거래내역.csv");
+            Resource resource = new ClassPathResource("static/data/거래내역.csv");
             List<TransactionHistory> histories = Files.readAllLines(resource.getFile().toPath(), StandardCharsets.UTF_8)
                     .stream().skip(1).map(line -> {
                         String[] split = line.split(",");
@@ -89,7 +89,7 @@ public class initData {
     @PostConstruct
     private void initManagementPoint() throws IOException {
         if (managementPointRepository.count() == 0) {
-            Resource resource = new ClassPathResource("static/관리점정보.csv");
+            Resource resource = new ClassPathResource("static/data/관리점정보.csv");
             List<ManagementPoint> managementPoints = Files.readAllLines(resource.getFile().toPath(), StandardCharsets.UTF_8)
                     .stream().skip(1).map(line -> {
                         String[] split = line.split(",");

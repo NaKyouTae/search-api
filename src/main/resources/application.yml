@@ -1,17 +1,30 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+# h2 db
 spring:
   datasource:
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:kpsecdb
-    username: sa
-    password:
+    url: jdbc:h2:mem:kpsecdb;MODE=MySQL
+    username: kpsec
+    password: kpsec
+  h2:
+    console:
+      enabled: true
+
+  # jpa
   jpa:
-    show-sql: true
+    hibernate:
+      ddl-auto: create
     properties:
       hibernate:
         format_sql: true
     database-platform: org.hibernate.dialect.H2Dialect
-  h2:
-    console:
-      enabled: true
+
 logging:
   config: classpath:static/logback.xml

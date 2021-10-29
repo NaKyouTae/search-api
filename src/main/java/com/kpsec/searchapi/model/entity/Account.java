@@ -1,9 +1,12 @@
 package com.kpsec.searchapi.model.entity;
 
 import com.sun.istack.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import javax.persistence.Entity;
 import javax.persistence.Id;
 
 /**
@@ -11,6 +14,9 @@ import javax.persistence.Id;
  */
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
 public class Account {
 
     /**
