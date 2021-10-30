@@ -1,14 +1,14 @@
 package com.kpsec.searchapi.service;
 
-import com.kpsec.searchapi.model.entity.Account;
-import com.kpsec.searchapi.model.entity.TransactionHistory;
+import com.kpsec.searchapi.model.entity.AccountEntity;
+import com.kpsec.searchapi.model.entity.TransactionHistoryEntity;
 import com.kpsec.searchapi.model.result.AccountResult;
-import com.kpsec.searchapi.repository.AccountRepository;
-import com.kpsec.searchapi.repository.TransactionHistoryRepository;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import com.kpsec.searchapi.model.result.NoAccountResult;
+import com.kpsec.searchapi.process.account.AccountProcess;
+import com.kpsec.searchapi.process.history.TransactionHistoryProcess;
+import com.kpsec.searchapi.service.account.AccountService;
+import com.kpsec.searchapi.util.DistinctUtil;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -22,71 +22,47 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 
 
-//@SpringBootTest
-//@TestPropertySource("classpath:application.yml")
 @ExtendWith(MockitoExtension.class)
 public class AccountServiceTest {
 
     @InjectMocks
-    private CustomerService customerService;
+    private AccountService accountService;
     @Mock
-    private AccountRepository accountRepository;
+    private AccountProcess accountProcess;
     @Mock
-    private TransactionHistoryRepository transactionHistoryRepository;
+    private TransactionHistoryProcess transactionHistoryProcess;
     @Mock
-    private List<Account> accounts;
+    private List<AccountEntity> accounts;
     @Mock
-    private List<TransactionHistory> histories2018;
-    @Mock
-    private List<TransactionHistory> histories2019;
+    private List<TransactionHistoryEntity> histories;
     @Mock
     private AccountResult accountResult;
-//    @Captor
-//    private ArgumentCaptor<TransactionHistory> accountNoCaptor;
 
     @BeforeEach
     public void getHistoryBefore() throws IOException {
-        Resource resourceOne = new ClassPathResource("static/data/계좌정보.csv");
-        accounts = Files.readAllLines(resourceOne.getFile().toPath(), StandardCharsets.UTF_8)
+        Resource accountResource = new ClassPathResource("static/data/계좌정보.csv");
+        accounts = Files.readAllLines(accountResource.getFile().toPath(), StandardCharsets.UTF_8)
                 .stream().skip(1).map(line -> {
                     String[] split = line.split(",");
-                    return Account.builder()
+                    return AccountEntity.builder()
                             .accountNo(split[0])
                             .accountName(split[1])
                             .branchCode(split[2])
                             .build();
                 }).collect(Collectors.toList());
 
-        Resource resourceTwo = new ClassPathResource("static/data/거래내역.csv");
-        histories2018 = Files.readAllLines(resourceTwo.getFile().toPath(), StandardCharsets.UTF_8)
+        Resource historyResource = new ClassPathResource("static/data/거래내역.csv");
+        histories = Files.readAllLines(historyResource.getFile().toPath(), StandardCharsets.UTF_8)
                 .stream()
                 .skip(1)
-                .filter(line -> line.split(",")[5].equals("N") && line.split(",")[0].startsWith("2018"))
+                .filter(line -> line.split(",")[5].equals("N"))
                 .map(line -> {
                     String[] split = line.split(",");
 
-                    return TransactionHistory.builder()
-                            .transactionDate(split[0])
-                            .accountNo(split[1])
-                            .transactionNo(split[2])
-                            .amount(Integer.parseInt(split[3]))
-                            .commission(Integer.parseInt(split[4]))
-                            .cancelYn(split[5].equals("Y"))
-                            .build();
-                }).collect(Collectors.toList());
-
-        histories2019 = Files.readAllLines(resourceTwo.getFile().toPath(), StandardCharsets.UTF_8)
-                .stream()
-                .skip(1)
-                .filter(line -> line.split(",")[5].equals("N") && line.split(",")[0].startsWith("2019"))
-                .map(line -> {
-                    String[] split = line.split(",");
-
-                    return TransactionHistory.builder()
+                    return TransactionHistoryEntity.builder()
                             .transactionDate(split[0])
                             .accountNo(split[1])
                             .transactionNo(split[2])
@@ -98,29 +74,88 @@ public class AccountServiceTest {
     }
 
     @Test
-    @DisplayName("2018 또는 2019년도 거래 금액이 제일 큰 계좌 조회")
-    public void getHistory() throws IOException {
-        Mockito.when(accountRepository.findAll()).thenReturn(accounts);
+    @Order(1)
+    @DisplayName("2018년도 또는 2019년도 거래 금액이 제일 큰 계좌 조회")
+    public void getAccountOfBestForYear() throws IOException {
 
-        ArgumentCaptor<String> accountNoCaptor = ArgumentCaptor.forClass(String.class);
+        // 조회 년도
+        List<String> years = new ArrayList<>();
 
-        Mockito.verify(transactionHistoryRepository).findByAccountNoAndTransactionDateStartingWithAndCancelYnFalse(accountNoCaptor.capture(), eq("2018"));
+        years.add("2019");
+        years.add("2018");
 
-        List<AccountResult> res = customerService.getHistory();
+        // when return
+        Mockito.when(accountProcess.getAccountAll()).thenReturn(accounts);
 
-        Mockito.when(transactionHistoryRepository.findByAccountNoAndTransactionDateStartingWithAndCancelYnFalse(any(), eq("2018"))).thenReturn(histories2018);
-        System.out.println(accountNoCaptor.getValue());
+        years.forEach(year -> {
+            accounts.forEach(account -> {
+                List<TransactionHistoryEntity> accountHistory = histories.stream().filter(item -> item.getAccountNo().equals(account.getAccountNo()) && item.getTransactionDate().startsWith(year)).collect(Collectors.toList());
+                Mockito.when(transactionHistoryProcess.getHistory(eq(account.getAccountNo()), eq(year))).thenReturn(accountHistory);
+            });
+        });
 
-        Mockito.verify(transactionHistoryRepository).findByAccountNoAndTransactionDateStartingWithAndCancelYnFalse(accountNoCaptor.capture(), eq("2019"));
-        Mockito.when(transactionHistoryRepository.findByAccountNoAndTransactionDateStartingWithAndCancelYnFalse(accountNoCaptor.getValue(), eq("2019"))).thenReturn(histories2019);
+        // when 실행
+        List<AccountResult> res = accountService.getAccountOfTopForYear(years);
 
-//        Mockito.verify(accountRepository).findAll();
-
+        // 예상 결과
         List<AccountResult> accountResults = new ArrayList<>();
 
-        accountResults.add(AccountResult.builder().year(2018).accountName("테드").accountNo("11111114").sumAmt(117000000).build());
-        accountResults.add(AccountResult.builder().year(2019).accountName("리노").accountNo("11111113").sumAmt(84700000).build());
+        accountResults.add(AccountResult.builder().year(2018).name("테드").acctNo("11111114").sumAmt(28992000).build());
+        accountResults.add(AccountResult.builder().year(2019).name("에이스").acctNo("11111112").sumAmt(40998400).build());
 
+        // 예측 결과와 실제 결과 비교
+        Assertions.assertArrayEquals(accountResults.toArray(), res.toArray());
+    }
+
+    @Test
+    @Order(2)
+    @DisplayName("2018년도 또는 2019년도 거래가 없는 계좌 조회")
+    public void getNoHistoryAccount() {
+
+        // 조회 년도
+        List<String> years = new ArrayList<>();
+
+        years.add("2019");
+        years.add("2018");
+
+        // when return
+        years.forEach(year -> {
+            List<TransactionHistoryEntity> accountHistory = histories.stream().filter(item -> item.getTransactionDate().startsWith(year)).collect(Collectors.toList());
+            Mockito.when(transactionHistoryProcess.getHistory(eq(year))).thenReturn(accountHistory);
+
+            List<TransactionHistoryEntity> distinctHistory = accountHistory.stream().filter(DistinctUtil.distinctByKey(history -> history.getAccountNo())).collect(Collectors.toList());
+
+            List<AccountEntity> noHistoryAccount = new ArrayList<>();
+
+            accounts.stream().map(account -> {
+                long count = distinctHistory.stream().filter(item -> item.getAccountNo().equals(account.getAccountNo())).count();
+
+                if(count == 0) {
+                    noHistoryAccount.add(account);
+                }
+
+                return null;
+            }).collect(Collectors.toList());
+
+            List<String> accountNos = distinctHistory.stream().map(TransactionHistoryEntity::getAccountNo).collect(Collectors.toList());
+
+            Mockito.when(accountProcess.getAccountNoHistory(eq(accountNos))).thenReturn(noHistoryAccount);
+        });
+
+        // when 실행
+        List<NoAccountResult> res = accountService.getNoHistoryAccountForYear(years);
+
+        // 예상 결과
+        List<NoAccountResult> accountResults = new ArrayList<>();
+
+        accountResults.add(NoAccountResult.builder().year(2018).name("사라").acctNo("11111115").build());
+        accountResults.add(NoAccountResult.builder().year(2018).name("제임스").acctNo("11111118").build());
+        accountResults.add(NoAccountResult.builder().year(2018).name("에이스").acctNo("11111121").build());
+        accountResults.add(NoAccountResult.builder().year(2019).name("테드").acctNo("11111114").build());
+        accountResults.add(NoAccountResult.builder().year(2019).name("제임스").acctNo("11111118").build());
+        accountResults.add(NoAccountResult.builder().year(2019).name("에이스").acctNo("11111121").build());
+
+        // 예측 결과와 실제 결과 비교
         Assertions.assertArrayEquals(accountResults.toArray(), res.toArray());
     }
 }

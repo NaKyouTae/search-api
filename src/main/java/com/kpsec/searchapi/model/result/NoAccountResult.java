@@ -10,7 +10,7 @@ import lombok.Data;
  */
 @Data
 @Builder
-public class AccountResult {
+public class NoAccountResult {
 
     /**
      * 연도
@@ -26,10 +26,5 @@ public class AccountResult {
      * 계좌번호
      */
     private String acctNo;
-
-    /**
-     * 총 금액
-     */
-    private int sumAmt;
 }
 

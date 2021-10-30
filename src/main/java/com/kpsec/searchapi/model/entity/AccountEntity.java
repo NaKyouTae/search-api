@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 계좌 관련 Entity
+ *
  * Create by na kyutae 2021-10-29.
  */
 @Data
@@ -19,7 +21,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "KPSEC_TB_ACCOUNT")
-public class Account {
+public class AccountEntity {
 
     /**
      * 계좌번호

@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 /**
+ * 거래내역 관련 Entity
+ *
  * Create by na kyutae 2021-10-29.
  */
 @Data
@@ -17,7 +19,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Entity
 @Table(name = "KPSEC_TB_TRANSACTION_HISTORY")
-public class TransactionHistory {
+public class TransactionHistoryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -1,13 +1,12 @@
 package com.kpsec.searchapi.infra.init;
 
-import com.kpsec.searchapi.model.entity.Account;
-import com.kpsec.searchapi.model.entity.ManagementPoint;
-import com.kpsec.searchapi.model.entity.TransactionHistory;
+import com.kpsec.searchapi.model.entity.AccountEntity;
+import com.kpsec.searchapi.model.entity.BranchEntity;
+import com.kpsec.searchapi.model.entity.TransactionHistoryEntity;
 import com.kpsec.searchapi.repository.AccountRepository;
-import com.kpsec.searchapi.repository.ManagementPointRepository;
+import com.kpsec.searchapi.repository.BranchRepository;
 import com.kpsec.searchapi.repository.TransactionHistoryRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -31,7 +30,7 @@ public class InitData {
 
     private final AccountRepository accountRepository; // 계좌 정보 Repository
     private final TransactionHistoryRepository transactionHistoryRepository; // 거래 내역 Repository
-    private final ManagementPointRepository managementPointRepository; // 관리점 Repository
+    private final BranchRepository managementPointRepository; // 관리점 Repository
 
     public void init() throws IOException {
         this.initAccount();
@@ -48,10 +47,10 @@ public class InitData {
     private void initAccount() throws IOException {
         if (accountRepository.count() == 0) {
             Resource resource = new ClassPathResource("static/data/계좌정보.csv");
-            List<Account> accounts = Files.readAllLines(resource.getFile().toPath(), StandardCharsets.UTF_8)
+            List<AccountEntity> accounts = Files.readAllLines(resource.getFile().toPath(), StandardCharsets.UTF_8)
                     .stream().skip(1).map(line -> {
                         String[] split = line.split(",");
-                        return Account.builder()
+                        return AccountEntity.builder()
                                 .accountNo(split[0])
                                 .accountName(split[1])
                                 .branchCode(split[2])
@@ -71,10 +70,10 @@ public class InitData {
     private void initHistory() throws IOException {
         if (transactionHistoryRepository.count() == 0) {
             Resource resource = new ClassPathResource("static/data/거래내역.csv");
-            List<TransactionHistory> histories = Files.readAllLines(resource.getFile().toPath(), StandardCharsets.UTF_8)
+            List<TransactionHistoryEntity> histories = Files.readAllLines(resource.getFile().toPath(), StandardCharsets.UTF_8)
                     .stream().skip(1).map(line -> {
                         String[] split = line.split(",");
-                        return TransactionHistory.builder()
+                        return TransactionHistoryEntity.builder()
                                 .transactionDate(split[0])
                                 .accountNo(split[1])
                                 .transactionNo(split[2])
@@ -97,12 +96,12 @@ public class InitData {
     private void initManagementPoint() throws IOException {
         if (managementPointRepository.count() == 0) {
             Resource resource = new ClassPathResource("static/data/관리점정보.csv");
-            List<ManagementPoint> managementPoints = Files.readAllLines(resource.getFile().toPath(), StandardCharsets.UTF_8)
+            List<BranchEntity> managementPoints = Files.readAllLines(resource.getFile().toPath(), StandardCharsets.UTF_8)
                     .stream().skip(1).map(line -> {
                         String[] split = line.split(",");
-                        return ManagementPoint.builder()
-                                .managementPointCode(split[0])
-                                .managementPointName(split[1])
+                        return BranchEntity.builder()
+                                .branchCode(split[0])
+                                .branchName(split[1])
                                 .build();
                     }).collect(Collectors.toList());
 

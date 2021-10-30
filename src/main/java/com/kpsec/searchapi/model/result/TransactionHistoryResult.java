@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.Data;
 
 /**
+ * 거래내역을 응답하기 위한 클래스
+ * 
  * Create by na kyutae 2021-10-29.
  */
 @Data

@@ -6,6 +6,8 @@ import lombok.*;
 import javax.persistence.*;
 
 /**
+ * 관리지점 관련 Entity
+ *
  * Create by na kyutae 2021-10-29.
  */
 @Data
@@ -13,20 +15,20 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "KPSEC_TB_MANAGEMENT_POINT")
-public class ManagementPoint {
+@Table(name = "KPSEC_TB_BRANCH")
+public class BranchEntity {
 
     /**
      * 관리점 코드
      */
     @Id
     @NotNull
-    private String managementPointCode;
+    private String branchCode;
 
     /**
      * 관리점 명
      */
     @NotNull
-    private String managementPointName;
+    private String branchName;
 
 }
