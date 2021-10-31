@@ -5,6 +5,7 @@ import com.kpsec.searchapi.model.response.ResponseCommon;
 import com.kpsec.searchapi.model.result.BranchResult;
 import com.kpsec.searchapi.service.branch.BranchService;
 import com.kpsec.searchapi.service.branch.BranchValidationService;
+import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.apache.catalina.connector.Response;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/branches")
 @RequiredArgsConstructor
+@Api(tags = "관리지점 관련 컨트롤러")
 public class BranchController {
 
     private final BranchService branchService;
@@ -32,6 +34,11 @@ public class BranchController {
      *
      * @return List<BranchResult> 지점 리스트
      */
+    @ApiOperation(value = "Get", notes = "연도별, 관리점 별 거래 금액의 순서를 조회", response = ResponseCommon.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "200 OK"),
+            @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR")
+    })
     @GetMapping("amounts")
     public ResponseCommon<List<BranchResult>> getBranchOfTopForYear() {
         List<BranchResult> branchResults = branchService.getBranchOfTopForYear();
@@ -60,8 +67,14 @@ public class BranchController {
      * @param branchName 지점명
      * @return BranchResult.Branch 지점의 정보 및 총 거래금액
      */
+    @ApiOperation(value = "Get", notes = "지점명을 입력 받아 해당 지점의 총 거래금액을 조회", response = ResponseCommon.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "200 OK"),
+            @ApiResponse(code = 404, message = "NOT_FOUND"),
+            @ApiResponse(code = 500, message = "INTERNAL_SERVER_ERROR")
+    })
     @GetMapping("/names")
-    public ResponseCommon<BranchResult.Branch> getBranchSumAmt(@RequestParam String branchName) {
+    public ResponseCommon<BranchResult.Branch> getBranchSumAmt(@ApiParam(value = "연도 리스트", required = true) @RequestParam(required = true) String branchName) {
         branchValidationService.validationBranchName(branchName);
 
         BranchResult.Branch branch = branchService.getBranchSumAmt(branchName);
