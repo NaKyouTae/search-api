@@ -56,13 +56,13 @@ public class BranchService {
     public List<BranchResult> getBranchOfTopForYear() {
         List<BranchResult> branchResults = new ArrayList<>();
 
-        List<BranchEntity> branchsInfo = branchProcess.getBranchAll();
+        List<BranchEntity> branchesInfo = branchProcess.getBranchAll();
         List<String> years = transactionHistoryProcess.getHistoryDistinctYear();
 
         years.forEach(year -> {
             List<TransactionHistoryEntity> histories = transactionHistoryProcess.getHistory(year);
             List<BranchResult.Branch> branches = new ArrayList<>();
-            branchsInfo.forEach(branchInfo -> {
+            branchesInfo.forEach(branchInfo -> {
                 int sumAmt = 0;
 
                 for(TransactionHistoryEntity history : histories) {
