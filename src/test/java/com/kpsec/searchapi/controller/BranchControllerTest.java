@@ -22,6 +22,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -207,12 +208,14 @@ public class BranchControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(get("/branches/names?branchName=" + brName)
                     .contentType("application/json;charset=UTF-8"))
-                    .andExpect(status().is4xxClientError())
                     .andDo(print())
                     .andReturn();
 
-            System.out.println("error mgs : " + mvcResult.getResponse().getErrorMessage());
-            Assertions.assertEquals(mvcResult.getResponse().getStatus(), 404);
+            ObjectMapper om = new ObjectMapper();
+            Map<String, String> map = om.readValue(mvcResult.getResponse().getContentAsString(), Map.class);
+
+            Assertions.assertEquals(map.get("status"), "NOT_FOUND");
+            Assertions.assertEquals(map.get("code"), 404);
         } catch (Exception e) {
             e.printStackTrace();
         }

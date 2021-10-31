@@ -30,7 +30,7 @@ public class SwaggerConfig implements WebMvcConfigurer {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("KPSEC - 과제 평가")
+                .title("KAKAOPAY SECURITY SEARCH API")
                 .build();
     }
 
@@ -39,7 +39,7 @@ public class SwaggerConfig implements WebMvcConfigurer {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(this.apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.kpsec.searchapi.contoller"))
+                .apis(RequestHandlerSelectors.basePackage("com.kpsec.searchapi.controller"))
                 .paths(PathSelectors.any())
                 .build();
     }
